@@ -18,6 +18,6 @@ export interface ICollection {
   id: CollectionId;
   name: string;
   population: number;
-  parent: CollectionId;
+  children: CollectionId[];
   keyDates: IKeyDates[];
 }

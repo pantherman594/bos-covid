@@ -9,7 +9,7 @@ const collections: ICollections = {
     id: CollectionId.BC,
     name: 'Boston College',
     population: 0,
-    parent: CollectionId.NONE,
+    children: [CollectionId.BC_UNDERGRAD, CollectionId.BC_COMMUNITY],
     keyDates: [
       {
         date: '2020-08-31',
@@ -21,7 +21,7 @@ const collections: ICollections = {
     id: CollectionId.BC_UNDERGRAD,
     name: 'Boston College Undergraduates',
     population: Math.round(9370 * 0.8),
-    parent: CollectionId.BC,
+    children: [],
     keyDates: [
       {
         date: '2020-08-17',
@@ -37,28 +37,28 @@ const collections: ICollections = {
     id: CollectionId.BC_COMMUNITY,
     name: 'Boston College Community',
     population: Math.round((4801 + 2621.45 + 878 + 1291.33) * 0.8),
-    parent: CollectionId.BC,
+    children: [],
     keyDates: [],
   },
   [CollectionId.BU]: {
     id: CollectionId.BU,
     name: 'Boston University',
     population: Math.round((34589 + 10517) * 0.8),
-    parent: CollectionId.NONE,
+    children: [],
     keyDates: [],
   },
   [CollectionId.NU]: {
     id: CollectionId.NU,
     name: 'Northeastern University',
     population: Math.round((20400 + 17379) + (3092 + 2859 + 210) * 0.8),
-    parent: CollectionId.NONE,
+    children: [],
     keyDates: [],
   },
   [CollectionId.MASS]: {
     id: CollectionId.MASS,
     name: 'Massachusetts',
     population: 6892503,
-    parent: CollectionId.NONE,
+    children: [],
     keyDates: [],
   },
 };
