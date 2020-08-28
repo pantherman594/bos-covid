@@ -25,7 +25,7 @@ const scrapeNu = async (): Promise<DocumentType<Data>> => {
     throw new Error('Invalid date format.');
   }
 
-  const [month, day, year] = date;
+  const [month, day, year] = date.map((n: number) => tryParseInt(n));
   const tested = tryParseInt(entries[entries.length - 6].content.$t);
   const positive = tryParseInt(entries[entries.length - 5].content.$t);
 
