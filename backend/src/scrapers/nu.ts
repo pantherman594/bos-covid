@@ -31,7 +31,7 @@ const scrapeNu = async (): Promise<DocumentType<Data>> => {
 
   return new DataModel({
     collectionId: CollectionId.NU,
-    date: ymdToString(year, month, day),
+    date: ymdToString(year + 2000, month, day),
     tested,
     positive,
   });
