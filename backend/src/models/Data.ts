@@ -4,40 +4,22 @@ import {
   prop,
 } from 'typegoose';
 
+import { CollectionId } from '../types';
+
 @index({ date: 1 })
+@index({ collection: 1, date: 1 })
 export class Data {
-  @prop({ required: true, default: Date.now })
-  public date!: Date;
+  @prop({ required: true, enum: CollectionId, type: String })
+  public collectionId!: CollectionId;
 
   @prop({ required: true })
-  public totalTested!: number;
+  public date!: string;
 
   @prop({ required: true })
-  public totalPositive!: number;
+  public tested!: number;
 
   @prop({ required: true })
-  public undergradTested!: number;
-
-  @prop({ required: true })
-  public undergradPositive!: number;
-
-  @prop({ required: true })
-  public isolation!: number;
-
-  @prop({ required: true })
-  public buPositive!: number;
-
-  @prop({ required: true })
-  public neuPositive!: number;
-
-  @prop({ required: true })
-  public suffolkPositive!: number;
-
-  @prop({ required: true })
-  public massPositive!: number;
-
-  @prop({ required: true, type: String, default: [] })
-  public flags!: string[];
+  public positive!: number;
 }
 
 const DataModel = getModelForClass(Data);

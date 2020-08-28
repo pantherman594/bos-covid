@@ -4,10 +4,11 @@ import express from 'express';
 import path from 'path';
 import { DocumentType } from 'typegoose';
 
-import DataModel, { Data } from './models/Data';
 import connectDB from './lib/db';
 import { setup } from './lib/error';
-import scrape from './scraper';
+import DataModel, { Data } from './models/Data';
+import scrape from './scrapers';
+import collections from './scrapers/collections';
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -58,7 +59,7 @@ app.use('/data', async (req, res) => {
     return { id: _id, ...cleanedEntry };
   });
 
-  res.json(cleanedData);
+  res.json({ collections, data: cleanedData });
 });
 
 app.use('/api/*', (req, res) => { // Handle 404

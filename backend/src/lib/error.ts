@@ -17,9 +17,9 @@ const error = (msg: string) => {
 
   if (emailEnabled) {
     client.sendEmail({
-      from: 'bccovid_error@dav.sh',
+      from: 'boscovid_error@dav.sh',
       to: 'davi@d-shen.xyz',
-      subject: 'Error with BC Covid-19 dashboard backend.',
+      subject: 'Error with Boston Covid-19 dashboard backend.',
       message: msgString.replace(/\r?\n/g, '<br />'),
       altText: msgString,
     }, (err, _data, _res) => {
