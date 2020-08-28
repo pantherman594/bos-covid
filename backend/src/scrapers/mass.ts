@@ -1,4 +1,3 @@
-import cheerio from 'cheerio';
 import fs from 'fs';
 import superagent from 'superagent';
 import tmp from 'tmp';
