@@ -68,7 +68,7 @@ const scrapeBc = async (): Promise<IBCData> => {
     throw new Error(`Did not store the correct number of data fields. Found: ${data.length}, Expected: ${EXPECTED_LABELS.length}.`);
   }
 
-  const updated = $('div.bc-padded-section:nth-child(2) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > em:nth-child(1)');
+  const updated = $('div.bc-padded-section:nth-child(2) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2)');
 
   // Ensure that we found the date.
   if (updated.length !== 1) {
