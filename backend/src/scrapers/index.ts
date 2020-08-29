@@ -6,9 +6,10 @@ import connectDB from '../lib/db';
 import error from '../lib/error';
 
 import {
+  scrapeBabson,
   scrapeBc,
-  scrapeBrandeis,
   scrapeBentley,
+  scrapeBrandeis,
   scrapeBu,
   scrapeNu,
   scrapeMass,
@@ -81,8 +82,9 @@ const scrape = async () => {
   try {
     await Promise.all([
       processBc(),
-      process(scrapeBrandeis),
+      process(scrapeBabson),
       process(scrapeBentley),
+      process(scrapeBrandeis),
       process(scrapeBu),
       process(scrapeNu),
       process(scrapeMass),

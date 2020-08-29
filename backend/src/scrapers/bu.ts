@@ -1,25 +1,10 @@
 import superagent from 'superagent';
 import { DocumentType } from 'typegoose';
 
-import { ymdToString } from '../lib/date';
+import { strToMonth, ymdToString } from '../lib/date';
 import { tryParseInt, tryTraverse } from '../lib/try';
 import DataModel, { Data } from '../models/Data';
 import { CollectionId } from '../types';
-
-const MONTHS = {
-  January: 1,
-  February: 2,
-  March: 3,
-  April: 4,
-  May: 5,
-  June: 6,
-  July: 7,
-  August: 8,
-  September: 9,
-  October: 10,
-  November: 11,
-  December: 12,
-} as any;
 
 // From
 // https://app.powerbi.com/view?r=eyJrIjoiMzI4OTBlMzgtODg5MC00OGEwLThlMDItNGJiNDdjMDU5ODhkIiwidCI6ImQ1N2QzMmNjLWMxMjEtNDg4Zi1iMDdiLWRmZTcwNTY4MGM3MSIsImMiOjN9,
@@ -167,13 +152,9 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
     throw new Error('Updated date format invalid.');
   }
 
-  const month = MONTHS[match[1]];
+  const month = strToMonth(match[1]);
   const day = tryParseInt(match[2]);
   const year = tryParseInt(match[3]);
-
-  if (month === undefined) {
-    throw new Error('Updated date format invalid.');
-  }
 
   return new DataModel({
     collectionId: CollectionId.BU,
