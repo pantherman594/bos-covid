@@ -7,6 +7,8 @@ import error from '../lib/error';
 
 import {
   scrapeBc,
+  scrapeBrandeis,
+  scrapeBentley,
   scrapeBu,
   scrapeNu,
   scrapeMass,
@@ -79,6 +81,8 @@ const scrape = async () => {
   try {
     await Promise.all([
       processBc(),
+      process(scrapeBrandeis),
+      process(scrapeBentley),
       process(scrapeBu),
       process(scrapeNu),
       process(scrapeMass),

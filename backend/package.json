@@ -19,6 +19,7 @@
     "lodash": "^4.17.20",
     "mongoose": "^5.10.0",
     "node-ses": "^3.0.2",
+    "pdf2json": "^1.2.0",
     "superagent": "^6.0.0",
     "tmp": "^0.2.1",
     "typegoose": "npm:@typegoose/typegoose@^7.3.2",
