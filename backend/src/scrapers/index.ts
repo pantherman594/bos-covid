@@ -13,6 +13,7 @@ import {
   scrapeBu,
   scrapeNu,
   scrapeTufts,
+  scrapeUmassAmherst,
   scrapeMass,
 } from './scrapers';
 
@@ -89,6 +90,7 @@ const scrape = async () => {
       process(scrapeBu),
       process(scrapeNu),
       process(scrapeTufts),
+      process(scrapeUmassAmherst),
       process(scrapeMass),
     ]);
   } catch (err) {

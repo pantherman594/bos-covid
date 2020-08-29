@@ -89,14 +89,8 @@ const scrapeBc = async (): Promise<IBCData> => {
 
   const month = tryParseInt(match[1]);
   const day = tryParseInt(match[2]);
-  let year = new Date().getUTCFullYear();
 
-  // If it's already January and the most up to date data is from December, use the previous year.
-  if (month > new Date().getUTCMonth() + 1) {
-    year -= 1;
-  }
-
-  const date = ymdToString(year, month, day);
+  const date = ymdToString(null, month, day);
 
   const [totalTested, totalPositive, undergradTested, undergradPositive] = data;
 
