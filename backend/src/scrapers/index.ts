@@ -65,16 +65,13 @@ const process = async (scraper: () => Promise<DocumentType<Data> | DocumentType<
       throw new Error('Collection does not exist.');
     }
 
-    // Find the newest entry with the same collection.
-    const entries = await DataModel
-      .find({ collectionId: testData.collectionId })
-      .sort({ date: -1 })
-      .limit(1)
-      .exec();
+    // Find the entry in the collection with the same date.
+    const lastEntry = await DataModel
+      .findOne({ collectionId: testData.collectionId, date: testData.date })
+      .exec() as any;
 
-    if (entries.length === 1) {
+    if (lastEntry) {
       // Check that the new entry differs from the latest entry.
-      const lastEntry = entries[0].toObject();
 
       const keys = Object.keys(testData.toObject()) as string[];
 
@@ -89,14 +86,8 @@ const process = async (scraper: () => Promise<DocumentType<Data> | DocumentType<
         return;
       }
 
-      if (lastEntry.date === testData.date) {
-        // If they have the same date, delete the out of date one.
-        log('<', scraper.name, `${testData.collectionId} data is different, replacing the old entry.`);
-
-        await DataModel.deleteOne({ _id: lastEntry._id }).exec();
-      }
-    } else if (entries.length > 1) {
-      throw new Error('Unexpected number of entries returned.');
+      log('<', scraper.name, `${testData.collectionId} data is different, replacing the old entry.`);
+      await DataModel.deleteOne({ _id: lastEntry._id }).exec();
     }
 
     // Save the new entry.

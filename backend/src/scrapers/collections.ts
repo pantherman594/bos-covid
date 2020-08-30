@@ -180,6 +180,18 @@ const collections: ICollections = {
       },
     ],
   },
+  [CollectionId.WELLESLEY]: {
+    id: CollectionId.WELLESLEY,
+    name: 'Wellesley College',
+    population: 0,
+    children: [],
+    keyDates: [
+      {
+        date: '2020-08-31',
+        comment: 'Classes begin',
+      },
+    ],
+  },
   [CollectionId.MASS]: {
     id: CollectionId.MASS,
     name: 'Massachusetts',

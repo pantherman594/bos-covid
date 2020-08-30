@@ -16,6 +16,7 @@ export enum CollectionId {
   NU = 'northeastern-university',
   TUFTS = 'tufts-university',
   UMASS_AMHERST = 'umass-amherst',
+  WELLESLEY = 'wellesley-college',
 
   MASS = 'massachusetts',
 }

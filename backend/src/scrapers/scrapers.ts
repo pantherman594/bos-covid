@@ -8,6 +8,7 @@ import scrapeMit from './mit';
 import scrapeNu from './nu';
 import scrapeTufts from './tufts';
 import scrapeUmassAmherst from './umass_amherst';
+import scrapeWellesley from './wellesley';
 import scrapeMass from './mass';
 
 const scrapers = [
@@ -21,6 +22,7 @@ const scrapers = [
   scrapeNu,
   scrapeTufts,
   scrapeUmassAmherst,
+  scrapeWellesley,
   scrapeMass,
 ];
 
