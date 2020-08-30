@@ -16,12 +16,7 @@ const EXPECTED_LABELS = [
   'Undergrads Testing Positive',
 ];
 
-interface IBCData {
-  undergrads: DocumentType<Data>;
-  community: DocumentType<Data>;
-}
-
-const scrapeBc = async (): Promise<IBCData> => {
+const scrapeBc = async (): Promise<DocumentType<Data>[]> => {
   // Attempt to load the webpage.
   const res = await superagent.get(DATA_URL);
   if (res.status !== 200) {
@@ -94,20 +89,20 @@ const scrapeBc = async (): Promise<IBCData> => {
 
   const [totalTested, totalPositive, undergradTested, undergradPositive] = data;
 
-  return {
-    undergrads: new DataModel({
+  return [
+    new DataModel({
       collectionId: CollectionId.BC_UNDERGRAD,
       date,
       tested: undergradTested,
       positive: undergradPositive,
     }),
-    community: new DataModel({
+    new DataModel({
       collectionId: CollectionId.BC_COMMUNITY,
       date,
       tested: totalTested - undergradTested,
       positive: totalPositive - undergradPositive,
     }),
-  };
+  ];
 };
 
 export default scrapeBc;

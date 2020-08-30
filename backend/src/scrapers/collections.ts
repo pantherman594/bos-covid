@@ -88,6 +88,50 @@ const collections: ICollections = {
       },
     ],
   },
+  [CollectionId.HARVARD]: {
+    id: CollectionId.HARVARD,
+    name: 'Harvard University',
+    population: 0,
+    children: [
+      CollectionId.HARVARD_UNDERGRAD,
+      CollectionId.HARVARD_GRAD,
+      CollectionId.HARVARD_OTHER,
+    ],
+    keyDates: [
+      {
+        date: '2020-09-02',
+        comment: 'Classes begin',
+      },
+    ],
+  },
+  [CollectionId.HARVARD]: {
+    id: CollectionId.HARVARD,
+    name: 'Harvard University Undergrads',
+    population: 0,
+    children: [],
+    keyDates: [],
+  },
+  [CollectionId.HARVARD_UNDERGRAD]: {
+    id: CollectionId.HARVARD_UNDERGRAD,
+    name: 'Harvard University Undergraduates',
+    population: 0,
+    children: [],
+    keyDates: [],
+  },
+  [CollectionId.HARVARD_GRAD]: {
+    id: CollectionId.HARVARD_GRAD,
+    name: 'Harvard University Graduate Students',
+    population: 0,
+    children: [],
+    keyDates: [],
+  },
+  [CollectionId.HARVARD_OTHER]: {
+    id: CollectionId.HARVARD_OTHER,
+    name: 'Harvard University Faculty, Staff, or Other Affiliates',
+    population: 0,
+    children: [],
+    keyDates: [],
+  },
   [CollectionId.NU]: {
     id: CollectionId.NU,
     name: 'Northeastern University',
@@ -120,30 +164,6 @@ const collections: ICollections = {
     keyDates: [
       {
         date: '2020-08-24',
-        comment: 'Classes begin',
-      },
-    ],
-  },
-  [CollectionId.UMASS_BOSTON]: {
-    id: CollectionId.UMASS_BOSTON,
-    name: 'UMass Boston',
-    population: 0,
-    children: [],
-    keyDates: [
-      {
-        date: '2020-09-08',
-        comment: 'Classes begin',
-      },
-    ],
-  },
-  [CollectionId.UMASS_LOWELL]: {
-    id: CollectionId.UMASS_LOWELL,
-    name: 'UMass Lowell',
-    population: 0,
-    children: [],
-    keyDates: [
-      {
-        date: '2020-09-01',
         comment: 'Classes begin',
       },
     ],

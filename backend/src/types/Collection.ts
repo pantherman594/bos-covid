@@ -8,11 +8,13 @@ export enum CollectionId {
   BENTLEY = 'bentley-university',
   BRANDEIS = 'brandeis-university',
   BU = 'boston-university',
+  HARVARD = 'harvard-university',
+  HARVARD_UNDERGRAD = 'harvard-university-undergrad',
+  HARVARD_GRAD = 'harvard-university-grad',
+  HARVARD_OTHER = 'harvard-university-other',
   NU = 'northeastern-university',
   TUFTS = 'tufts-university',
   UMASS_AMHERST = 'umass-amherst',
-  UMASS_BOSTON = 'umass-boston',
-  UMASS_LOWELL = 'umass-lowell',
 
   MASS = 'massachusetts',
 }
