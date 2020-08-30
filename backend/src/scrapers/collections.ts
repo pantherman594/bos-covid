@@ -132,6 +132,18 @@ const collections: ICollections = {
     children: [],
     keyDates: [],
   },
+  [CollectionId.MIT]: {
+    id: CollectionId.MIT,
+    name: 'Massachusetts Institute of Technology',
+    population: 0,
+    children: [],
+    keyDates: [
+      {
+        date: '2020-09-01',
+        comment: 'Classes begin',
+      },
+    ],
+  },
   [CollectionId.NU]: {
     id: CollectionId.NU,
     name: 'Northeastern University',

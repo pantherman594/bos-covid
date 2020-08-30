@@ -12,6 +12,7 @@ export enum CollectionId {
   HARVARD_UNDERGRAD = 'harvard-university-undergrad',
   HARVARD_GRAD = 'harvard-university-grad',
   HARVARD_OTHER = 'harvard-university-other',
+  MIT = 'massachusetts-institute-of-technology',
   NU = 'northeastern-university',
   TUFTS = 'tufts-university',
   UMASS_AMHERST = 'umass-amherst',

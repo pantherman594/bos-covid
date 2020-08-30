@@ -4,6 +4,7 @@ import scrapeBentley from './bentley';
 import scrapeBrandeis from './brandeis';
 import scrapeBu from './bu';
 import scrapeHarvard from './harvard';
+import scrapeMit from './mit';
 import scrapeNu from './nu';
 import scrapeTufts from './tufts';
 import scrapeUmassAmherst from './umass_amherst';
@@ -16,6 +17,7 @@ const scrapers = [
   scrapeBrandeis,
   scrapeBu,
   scrapeHarvard,
+  scrapeMit,
   scrapeNu,
   scrapeTufts,
   scrapeUmassAmherst,
