@@ -126,7 +126,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
 
   const data = JSON.parse(res.text);
 
-  const [tested, _negative, _invalid, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
+  const [tested, , , positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
     'PH', 0, 'DM0', 0, 'C']);
 
   if (typeof tested !== 'number' || typeof positive !== 'number') {
