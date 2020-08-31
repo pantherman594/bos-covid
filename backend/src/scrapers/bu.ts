@@ -10,6 +10,7 @@ import { CollectionId } from '../types';
 // https://app.powerbi.com/view?r=eyJrIjoiMzI4OTBlMzgtODg5MC00OGEwLThlMDItNGJiNDdjMDU5ODhkIiwidCI6ImQ1N2QzMmNjLWMxMjEtNDg4Zi1iMDdiLWRmZTcwNTY4MGM3MSIsImMiOjN9,
 // and https://www.bu.edu/healthway/community-dashboard/.
 const DATA_URL = 'https://wabi-us-north-central-api.analysis.windows.net/public/reports/querydata?synchronous=true';
+const RESOURCE_KEY = '32890e38-8890-48a0-8e02-4bb47c05988d';
 
 const DATA_COMMAND = {
   Query: {
@@ -22,20 +23,6 @@ const DATA_COMMAND = {
           Property: 'Cumulative Results',
         },
         Name: 'Cumulative Testing Combined.Cumulative Results',
-      },
-      {
-        Measure: {
-          Expression: { SourceRef: { Source: 'c' } },
-          Property: 'Cumulative Negatives',
-        },
-        Name: 'Cumulative Testing Combined.Cumulative Negatives',
-      },
-      {
-        Measure: {
-          Expression: { SourceRef: { Source: 'c' } },
-          Property: 'Cumulative Invalid',
-        },
-        Name: 'Cumulative Testing Combined.Cumulative Invalid',
       },
       {
         Measure: {
@@ -60,7 +47,7 @@ const DATA_COMMAND = {
     }],
   },
   Binding: {
-    Primary: { Groupings: [{ Projections: [0, 1, 2, 3] }] },
+    Primary: { Groupings: [{ Projections: [0, 1] }] },
     DataReduction: { DataVolume: 3, Primary: { Window: {} } },
     Version: 1,
   },
@@ -98,7 +85,6 @@ const generateRequest = (command: any) => {
     version: '1.0.0',
     queries: [{
       Query: query,
-      CacheKey: JSON.stringify(query),
       QueryId: '',
       ApplicationContext: {
         DatasetId: '05640cb4-075c-4bec-87d1-2b0b7df65918',
@@ -115,9 +101,9 @@ const generateRequest = (command: any) => {
 };
 
 const scrapeBu = async (): Promise<DocumentType<Data>> => {
-  // Attempt to load the webpage.
   const res = await superagent.post(DATA_URL)
     .send(generateRequest(DATA_COMMAND))
+    .set('X-PowerBI-ResourceKey', RESOURCE_KEY)
     .set('Accept', 'application/json');
 
   if (res.status !== 200) {
@@ -126,7 +112,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
 
   const data = JSON.parse(res.text);
 
-  const [tested, , , positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
+  const [tested, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
     'PH', 0, 'DM0', 0, 'C']);
 
   if (typeof tested !== 'number' || typeof positive !== 'number') {
@@ -135,6 +121,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
 
   const dateRes = await superagent.post(DATA_URL)
     .send(generateRequest(DATE_COMMAND))
+    .set('X-PowerBI-ResourceKey', RESOURCE_KEY)
     .set('Accept', 'application/json');
 
   if (dateRes.status !== 200) {
