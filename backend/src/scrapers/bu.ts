@@ -72,19 +72,17 @@ const DATE_COMMAND = {
   },
 };
 
-const generateRequest = (command: any) => {
-  const query = {
-    Commands: [
-      {
-        SemanticQueryDataShapeCommand: command,
-      },
-    ],
-  };
-
+const generateRequest = (...commands: any[]) => {
   const request = {
     version: '1.0.0',
-    queries: [{
-      Query: query,
+    queries: commands.map((command: any) => ({
+      Query: {
+        Commands: [
+          {
+            SemanticQueryDataShapeCommand: command,
+          },
+        ],
+      },
       QueryId: '',
       ApplicationContext: {
         DatasetId: '05640cb4-075c-4bec-87d1-2b0b7df65918',
@@ -92,7 +90,7 @@ const generateRequest = (command: any) => {
           ReportId: '0f711970-f662-4b15-9c08-1d4090b80ec9',
         }],
       },
-    }],
+    })),
     cancelQueries: [],
     modelId: 11982553,
   };
@@ -102,7 +100,7 @@ const generateRequest = (command: any) => {
 
 const scrapeBu = async (): Promise<DocumentType<Data>> => {
   const res = await superagent.post(DATA_URL)
-    .send(generateRequest(DATA_COMMAND))
+    .send(generateRequest(DATA_COMMAND, DATE_COMMAND))
     .set('X-PowerBI-ResourceKey', RESOURCE_KEY)
     .set('Accept', 'application/json');
 
@@ -119,18 +117,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
     throw new Error('Incorrect data type found.');
   }
 
-  const dateRes = await superagent.post(DATA_URL)
-    .send(generateRequest(DATE_COMMAND))
-    .set('X-PowerBI-ResourceKey', RESOURCE_KEY)
-    .set('Accept', 'application/json');
-
-  if (dateRes.status !== 200) {
-    throw new Error(`Request failed with error code ${dateRes.status}.`);
-  }
-
-  const dateData = JSON.parse(dateRes.text);
-
-  const updatedText = tryTraverse(dateData, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
+  const updatedText = tryTraverse(data, ['results', 1, 'result', 'data', 'dsr', 'DS', 0,
     'PH', 0, 'DM0', 0, 'M0']);
 
   const match = updatedText.match(/^Student Testing through ([A-Z][a-z]+) ([0-9]{1,2}), ([0-9]{4})$/);
