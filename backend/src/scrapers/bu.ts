@@ -26,13 +26,6 @@ const DATA_COMMAND = {
       {
         Measure: {
           Expression: { SourceRef: { Source: 'c' } },
-          Property: 'Cumulative Positives',
-        },
-        Name: 'Cumulative Testing Combined.Cumulative Positives',
-      },
-      {
-        Measure: {
-          Expression: { SourceRef: { Source: 'c' } },
           Property: 'Cumulative Negatives',
         },
         Name: 'Cumulative Testing Combined.Cumulative Negatives',
@@ -43,6 +36,13 @@ const DATA_COMMAND = {
           Property: 'Cumulative Invalid',
         },
         Name: 'Cumulative Testing Combined.Cumulative Invalid',
+      },
+      {
+        Measure: {
+          Expression: { SourceRef: { Source: 'c' } },
+          Property: 'Cumulative Positives',
+        },
+        Name: 'Cumulative Testing Combined.Cumulative Positives',
       },
     ],
     OrderBy: [{
@@ -126,7 +126,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
 
   const data = JSON.parse(res.text);
 
-  const [tested, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
+  const [tested, _negative, _invalid, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
     'PH', 0, 'DM0', 0, 'C']);
 
   if (typeof tested !== 'number' || typeof positive !== 'number') {

@@ -29,12 +29,12 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
 
   const data = txtRes.text.split('\r\n');
 
-  const testedMatch = data[2].match(/^Total Tests Performed: ([0-9]+)$/);
+  const testedMatch = data[2].match(/^Total Tests Performed: ([0-9,]+)$/);
   if (!testedMatch) {
     throw new Error('Could not find total tested data.');
   }
 
-  const positivesMatch = data[8].match(/^Unique Positive Individuals: ([0-9]+)$/);
+  const positivesMatch = data[8].match(/^Unique Positive Individuals: ([0-9,]+)$/);
   if (!positivesMatch) {
     throw new Error('Could not find total tested data.');
   }
@@ -42,8 +42,8 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
   return new DataModel({
     collectionId: CollectionId.TUFTS,
     date: ymdToString(year + 2000, month, day),
-    tested: testedMatch[1],
-    positive: positivesMatch[1],
+    tested: tryParseInt(testedMatch[1].replace(/[^0-9]/g, '')),
+    positive: tryParseInt(positivesMatch[1].replace(/[^0-9]/g, '')),
   });
 };
 
