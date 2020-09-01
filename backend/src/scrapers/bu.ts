@@ -104,10 +104,6 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
     .set('X-PowerBI-ResourceKey', RESOURCE_KEY)
     .set('Accept', 'application/json');
 
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
-
   const data = JSON.parse(res.text);
 
   const [tested, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,

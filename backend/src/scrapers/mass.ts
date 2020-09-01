@@ -6,7 +6,7 @@ import unzipper from 'unzipper';
 import xlsx from 'xlsx';
 
 import DataModel, { Data } from '../models/Data';
-import dateToString from '../lib/date';
+import { dateToString } from '../lib/date';
 import { CollectionId } from '../types';
 
 const LINK_ROOT = 'https://www.mass.gov';
@@ -38,9 +38,6 @@ const dlAndParse = (link: string) => new Promise<xlsx.WorkBook>((resolve, _rejec
 const scrapeMass = async (): Promise<DocumentType<Data>> => {
   // Attempt to load the webpage.
   const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
 
   const link = res.text.match(/\/doc\/covid-19-raw-data-[a-z]+-[0-9]{1,2}-20[0-9]{2}\/download/);
   if (!link || link.length !== 1) {

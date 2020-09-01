@@ -14,15 +14,22 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DATA_URL = 'https://www.wellesley.edu/coronavirus/dashboard';
 
 const EXPECTED_LABELS = [
-  'Total Asymptomatic Tests in Past 7 Testing Days',
+  'Total Asymptomatic Test Results in Past 7 Testing Days',
   'Positive Cases in Past 7 Testing Days',
 ];
 
 const scrapeWellesley = async (): Promise< DocumentType<Data>[]> => {
   // Attempt to load the webpage.
-  const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
+  let res;
+  try {
+    res = await superagent.get(DATA_URL);
+  } catch (err) {
+    if (err.status === 403) {
+      // This is a known error with no known solution. We'll just ignore it for now.
+      return [];
+    }
+
+    throw err;
   }
 
   const $ = cheerio.load(res.text);

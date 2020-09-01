@@ -1,5 +1,10 @@
 export const tryParseInt = (a: any, radix = 10) => {
-  const res = parseInt(a, radix);
+  let s = a;
+  if (typeof a === 'string') {
+    s = a.replace(/[^0-9.]/g, '');
+  }
+
+  const res = parseInt(s, radix);
 
   if (Number.isNaN(res)) {
     throw new Error('Invalid integer.');

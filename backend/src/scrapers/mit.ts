@@ -29,9 +29,6 @@ const dlAndParse = (link: string) => new Promise<xlsx.WorkBook>((resolve, _rejec
 const scrapeMit = async (): Promise<DocumentType<Data>> => {
   // Attempt to load the webpage.
   const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
 
   const link = res.text.match(/<a href="(\/sites\/default\/files\/covid_testing_([0-9]{4})([0-9]{2})([0-9]{2}).xlsx)">Download table data<\/a>/);
   if (!link) {

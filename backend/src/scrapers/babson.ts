@@ -12,15 +12,12 @@ const DATA_URL = 'https://www.babson.edu/emergency-preparedness/return-to-campus
 const EXPECTED_ROWS = [
   'Students',
   'Employees',
-  'Service Providers**',
+  'ServiceProviders**',
 ];
 
 const scrapeBabson = async (): Promise<DocumentType<Data>> => {
   // Attempt to load the webpage.
   const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
 
   const $ = cheerio.load(res.text);
 
@@ -32,8 +29,8 @@ const scrapeBabson = async (): Promise<DocumentType<Data>> => {
     throw new Error('Did not find the tested box.');
   }
 
-  const testedTitle = testedBox.find('p');
-  const testedValue = testedBox.find('h2');
+  const testedTitle = testedBox.find('h3');
+  const testedValue = testedBox.find('.test-number');
 
   // Ensure we have the expected labels and fields.
   if (testedTitle.length !== 1 || testedValue.length !== 1) {
@@ -47,34 +44,34 @@ const scrapeBabson = async (): Promise<DocumentType<Data>> => {
   const tested = tryParseInt(testedValue.text().trim());
 
   // Extract the grid of data items from the page.
-  const positivesTable = $('#id-1248929 > table:nth-child(2) > thead:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > table:nth-child(2)');
+  const positiveBox = $('#id-1248929 > table:nth-child(2) > thead:nth-child(1) > tr:nth-child(2) > td:nth-child(3)');
 
   // Ensure that we found the grid.
-  if (positivesTable.length !== 1) {
-    throw new Error('Did not find the positives table.');
+  if (positiveBox.length !== 1) {
+    throw new Error('Did not find the positives box.');
   }
 
-  const rows = positivesTable.find('tr');
+  const positiveTitle = positiveBox.find('h3');
+  const positiveValues = positiveBox.find('.numbers');
 
   // Ensure we have the expected labels and fields.
-  if (rows.length !== EXPECTED_ROWS.length) {
-    throw new Error('Did not find the correct number of positive rows.');
+  if (positiveTitle.length !== 1 || positiveValues.length !== EXPECTED_ROWS.length) {
+    throw new Error('Did not find the correct positive box.');
+  }
+
+  if (positiveTitle.text().trim() !== 'Cumulative Positive Test Results') {
+    throw new Error('Labels have changed, please fix scraper.');
   }
 
   const data: string[] = [];
 
   const failedLabels: string[] = [];
-  rows.each(function f(this: Cheerio, i: number, _elem: any) {
-    const cols = $(this).find('td');
-    if (cols.length !== 2) {
-      throw new Error('Invalid table structure found.');
-    }
-
-    if ($(cols[0]).text().trim() !== EXPECTED_ROWS[i]) {
+  positiveValues.each(function f(this: Cheerio, i: number, _elem: any) {
+    if (!$(this).text().trim().startsWith(EXPECTED_ROWS[i])) {
       failedLabels.push(EXPECTED_ROWS[i]);
     }
 
-    data.push($(cols[1]).text());
+    data.push($(this).text());
   });
 
   if (failedLabels.length > 0) {
@@ -82,7 +79,7 @@ const scrapeBabson = async (): Promise<DocumentType<Data>> => {
   }
 
   const positive = data.reduce((total: number, value: string) => {
-    return total + tryParseInt(value.replace(/[^0-9]/g, ''));
+    return total + tryParseInt(value);
   }, 0);
 
   const updated = $('#id-1245136 > p:nth-child(3)');

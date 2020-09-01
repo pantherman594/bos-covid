@@ -10,9 +10,6 @@ const DATA_URL = 'https://coronavirus.tufts.edu/testing-metrics';
 
 const scrapeTufts = async (): Promise<DocumentType<Data>> => {
   const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
 
   const match = res.text.match(/<img alt="Tufts COVID-19 testing metrics displayed in tables and graphs. The information reflects test samples collected through ([0-9\/]{6,8}) and results that were received through ([0-9\/]{6,8})." longdesc="([^"]+)" src="/);
   if (!match) {
@@ -23,9 +20,6 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
   const txtUrl = match[3];
 
   const txtRes = await superagent.get(txtUrl);
-  if (txtRes.status !== 200) {
-    throw new Error(`Request failed with error code ${txtRes.status}.`);
-  }
 
   const data = txtRes.text.split('\r\n');
 

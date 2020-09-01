@@ -19,9 +19,6 @@ const EXPECTED_LABELS = [
 const scrapeBc = async (): Promise<DocumentType<Data>[]> => {
   // Attempt to load the webpage.
   const res = await superagent.get(DATA_URL);
-  if (res.status !== 200) {
-    throw new Error(`Request failed with error code ${res.status}.`);
-  }
 
   const $ = cheerio.load(res.text);
 
