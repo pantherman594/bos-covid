@@ -1,62 +1,146 @@
-import fs from 'fs';
+import cheerio from 'cheerio';
 import superagent from 'superagent';
-import tmp from 'tmp';
 import { DocumentType } from 'typegoose';
-import xlsx from 'xlsx';
 
 import { ymdToString } from '../lib/date';
-import { tryParseInt } from '../lib/try';
+import { tryParseInt, tryTraverse } from '../lib/try';
 import DataModel, { Data } from '../models/Data';
 import { CollectionId } from '../types';
 
-const LINK_ROOT = 'https://medical.mit.edu';
-const DATA_URL = `${LINK_ROOT}/CovidTestingResults`;
+const DATA_URL = 'https://tableau.mit.edu/t/COVID-19/views/COVIDTestResultsforMITMedicalWebpage-2/Dashboard1?:isGuestRedirectFromVizportal=y&:embed=y';
 
-const dlAndParse = (link: string) => new Promise<xlsx.WorkBook>((resolve, _reject) => {
-  const tmpFile = tmp.tmpNameSync();
-  const writeStream = fs.createWriteStream(tmpFile);
+const dateMatch = new RegExp(/^[A-Z][a-z]+\n([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/);
 
-  superagent.get(LINK_ROOT + link).pipe(writeStream);
+const parseDate = (str: string) => {
+  const match = str.match(dateMatch);
+  if (!match) {
+    throw new Error('Invalid date format.');
+  }
 
-  writeStream.on('finish', () => {
-    const workbook = xlsx.readFile(tmpFile);
-    fs.unlinkSync(tmpFile);
+  const [, month, day, year] = match;
 
-    resolve(workbook);
-  });
-});
+  return ymdToString(tryParseInt(year), tryParseInt(month), tryParseInt(day));
+};
 
 const scrapeMit = async (): Promise<DocumentType<Data>> => {
   // Attempt to load the webpage.
-  const res = await superagent.get(DATA_URL);
+  const res = await superagent.get(DATA_URL).set('User-Agent', '');
 
-  const link = res.text.match(/<a href="(\/sites\/default\/files\/covid_testing_([0-9]{4})([0-9]{2})([0-9]{2}).xlsx)">Download table data<\/a>/);
-  if (!link) {
-    throw new Error('Did not find the data link.');
+  const findConfig = res.text.match(/<textarea id="tsConfigContainer">(.+)<\/textarea>/);
+  if (!findConfig || findConfig.length !== 2) {
+    throw new Error('Could not find session config.');
   }
 
-  // Ignore the total match.
-  link.shift();
+  const doc = cheerio.load(findConfig[1]);
+  const config = JSON.parse(doc.root().text());
+  const { sessionid, stickySessionKey } = config;
 
-  const [wbLink, year, month, day] = link;
-  const workbook = await dlAndParse(wbLink);
-  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-  const data = xlsx.utils.sheet_to_json(worksheet) as any;
+  const setup = await superagent
+    .post(`https://tableau.mit.edu/vizql/t/COVID-19/w/COVIDTestResultsforMITMedicalWebpage-2/v/Dashboard1/bootstrapSession/sessions/${sessionid}`)
+    .field('worksheetPortSize', '{"w":800,"h":1200}')
+    .field('dashboardPortSize', '{"w":800,"h":1200}')
+    .field('clientDimension', '{"w":1232,"h":945}')
+    .field('renderMapsClientSide', true)
+    .field('isBrowserRendering', true)
+    .field('browserRenderingThreshold', 100)
+    .field('formatDataValueLocally', false)
+    .field('clientNum', '')
+    .field('navType', 'Reload')
+    .field('navSrc', 'Top')
+    .field('devicePixelRatio', 1)
+    .field('clientRenderPixelLimit', 25000000)
+    .field('allowAutogenWorksheetPhoneLayouts', true)
+    .field('sheet_id', 'Dashboard%201')
+    .field('showParams', '{"checkpoint":false,"refresh":false,"refreshUnmodified":false}')
+    .field('stickySessionKey', JSON.stringify(stickySessionKey))
+    .field('filterTileSize', 200)
+    .field('locale', 'en_US')
+    .field('language', 'en')
+    .field('verboseMode', false)
+    .field(':session_feature_flags', '{}')
+    .field('keychain_version', 1)
+    .buffer(true)
+    .parse(superagent.parse.image);
 
-  if (data.length === 0) {
-    throw new Error('Invalid data.');
+  const data = setup.body.toString().match(/^[0-9]+;{.+}[0-9]+;(.+)$/);
+  if (!data) {
+    throw new Error('Invalid data returned.');
   }
 
-  if (data[0].DATE === undefined || data[0]['Positive tests'] || data[0][' Tests '] === undefined) {
-    throw new Error('Invalid data.');
+  const secondaryData = JSON.parse(data[1]);
+
+  let dataValues = tryTraverse(secondaryData, [
+    'secondaryInfo',
+    'presModelMap',
+    'dataDictionary',
+    'presModelHolder',
+    'genDataDictionaryPresModel',
+    'dataSegments',
+    0,
+    'dataColumns',
+    1,
+    'dataValues',
+  ]);
+
+  const monthlyRes = await superagent
+    .post(`https://tableau.mit.edu/vizql/t/COVID-19/w/COVIDTestResultsforMITMedicalWebpage-2/v/Dashboard1/sessions/${sessionid}/commands/tabdoc/set-parameter-value`)
+    .field('globalFieldName', '[Parameters].[Parameter 9]')
+    .field('valueString', 'Monthly')
+    .field('useUsLocale', 'false')
+    .buffer(true)
+    .parse(superagent.parse.image);
+
+  const monthlyData = JSON.parse(monthlyRes.body.toString());
+
+  const newDataValues = tryTraverse(monthlyData, [
+    'vqlCmdResponse',
+    'layoutStatus',
+    'applicationPresModel',
+    'dataDictionary',
+    'dataSegments',
+    1,
+    'dataColumns',
+    1,
+    'dataValues',
+  ]);
+
+  dataValues = [...dataValues, ...newDataValues];
+
+  const columns = tryTraverse(monthlyData, [
+    'vqlCmdResponse',
+    'layoutStatus',
+    'applicationPresModel',
+    'workbookPresModel',
+    'dashboardPresModel',
+    'zones',
+    3,
+    'presModelHolder',
+    'visual',
+    'vizData',
+    'paneColumnsData',
+    'paneColumnsList',
+    0,
+    'vizPaneColumns',
+    4,
+    'aliasIndices',
+  ]);
+
+  let positive = 0;
+  let tested = 0;
+
+  for (let i = 0; i < columns.length; i += 2) {
+    const positiveIndex = -1 - columns[i];
+    const testedIndex = -1 - columns[i + 1];
+
+    positive += tryParseInt(dataValues[positiveIndex]);
+    tested += tryParseInt(dataValues[testedIndex]);
   }
 
-  const tested = data.reduce((sum: number, row: any) => sum + row[' Tests '], 0);
-  const positive = data.reduce((sum: number, row: any) => sum + row['Positive tests'], 0);
+  const date = parseDate(dataValues[0]);
 
   return new DataModel({
     collectionId: CollectionId.MIT,
-    date: ymdToString(tryParseInt(year), tryParseInt(month), tryParseInt(day)),
+    date,
     tested,
     positive,
   });
