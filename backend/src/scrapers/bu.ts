@@ -106,15 +106,20 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
 
   const data = JSON.parse(res.text);
 
-  const [tested, positive] = tryTraverse(data, ['results', 0, 'result', 'data', 'dsr', 'DS', 0,
-    'PH', 0, 'DM0', 0, 'C']);
+  const dataJob = tryTraverse(data, ['jobIds', 0]);
+
+  const dataIndex = tryTraverse(data, ['results', 0, 'jobId']) === dataJob ? 0 : 1;
+  const dateIndex = 1 - dataIndex;
+
+  const [tested, positive] = tryTraverse(data, ['results', dataIndex, 'result', 'data',
+    'dsr', 'DS', 0, 'PH', 0, 'DM0', 0, 'C']);
 
   if (typeof tested !== 'number' || typeof positive !== 'number') {
     throw new Error('Incorrect data type found.');
   }
 
-  const updatedText = tryTraverse(data, ['results', 1, 'result', 'data', 'dsr', 'DS', 0,
-    'PH', 0, 'DM0', 0, 'M0']);
+  const updatedText = tryTraverse(data, ['results', dateIndex, 'result', 'data', 'dsr',
+    'DS', 0, 'PH', 0, 'DM0', 0, 'M0']);
 
   const match = updatedText.match(/^Student Testing through ([A-Z][a-z]+) ([0-9]{1,2}), ([0-9]{4})$/);
 

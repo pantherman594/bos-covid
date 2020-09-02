@@ -110,7 +110,7 @@ const scrapeHarvard = async (): Promise<DocumentType<Data>[]> => {
     throw new Error(`Did not store the correct number of data fields. Found: ${testedData.length}, Expected: ${EXPECTED_TESTED_LABELS.length}.`);
   }
 
-  const updated = $('.field-item > p:nth-child(4)');
+  const updated = $('.field-item > p:last-child');
 
   // Ensure that we found the date.
   if (updated.length !== 1) {
