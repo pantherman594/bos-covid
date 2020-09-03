@@ -12,7 +12,7 @@ const DATA_URL = 'https://www.bc.edu/content/bc-web/sites/reopening-boston-colle
 const EXPECTED_LABELS = [
   'BC Community tests performed',
   'Total Positives',
-  'Undergrads Tested',
+  'Total Undergraduate Tests',
   'Undergrads Testing Positive',
 ];
 
@@ -60,7 +60,7 @@ const scrapeBc = async (): Promise<DocumentType<Data>[]> => {
     throw new Error(`Did not store the correct number of data fields. Found: ${data.length}, Expected: ${EXPECTED_LABELS.length}.`);
   }
 
-  const updated = $('div.bc-padded-section:nth-child(2) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2)');
+  const updated = $('div.bc-padded-section:nth-child(3) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2)');
 
   // Ensure that we found the date.
   if (updated.length !== 1) {
@@ -69,11 +69,7 @@ const scrapeBc = async (): Promise<DocumentType<Data>[]> => {
 
   const updatedText = updated.text().trim();
 
-  if (!updatedText.startsWith('Through: ')) {
-    throw new Error('Updated date format invalid.');
-  }
-
-  const match = updatedText.match(/^Through: ([0-9]{1,2})\/([0-9]{1,2})$/);
+  const match = updatedText.match(/^8\/16 through ([0-9]{1,2})\/([0-9]{1,2})$/);
 
   if (!match) {
     throw new Error('Updated date format invalid.');
