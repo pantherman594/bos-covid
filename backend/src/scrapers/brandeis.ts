@@ -126,11 +126,12 @@ const scrapeBrandeis = async (): Promise<DocumentType<Data>> => {
   const tested = tryParseInt(dataValues[testedIndex]) + prev.tested;
   const positive = tryParseInt(dataValues[positiveIndex]) + prev.positive;
 
-  if (!dataValues[0] || !dataValues[0].match(/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}.+$/)) {
+  const updated = dataValues[dataValues.length - 1];
+  if (!updated.match(/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}.+$/)) {
     throw new Error('Invalid date format.');
   }
 
-  const date = dataValues[0].split(' ')[0].split('/');
+  const date = updated.split(' ')[0].split('/');
 
   const [month, day, year] = date.map((n: string) => tryParseInt(n));
 
