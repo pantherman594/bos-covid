@@ -60,9 +60,9 @@ const DATE_COMMAND = {
     Select: [{
       Measure: {
         Expression: { SourceRef: { Source: 't' } },
-        Property: 'Header Student Test through Date',
+        Property: 'Header BU Test through Date',
       },
-      Name: 'Testing Today Combined.Header Student Test through Date',
+      Name: 'Testing Today Combined.Header BU Test through Date',
     }],
   },
   Binding: {
@@ -121,7 +121,7 @@ const scrapeBu = async (): Promise<DocumentType<Data>> => {
   const updatedText = tryTraverse(data, ['results', dateIndex, 'result', 'data', 'dsr',
     'DS', 0, 'PH', 0, 'DM0', 0, 'M0']);
 
-  const match = updatedText.match(/^Student Testing through ([A-Z][a-z]+) ([0-9]{1,2}), ([0-9]{4})$/);
+  const match = updatedText.match(/^BU Testing through ([A-Z][a-z]+) ([0-9]{1,2}), ([0-9]{4})$/);
 
   if (!match) {
     throw new Error('Updated date format invalid.');
