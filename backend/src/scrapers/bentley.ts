@@ -102,17 +102,26 @@ const scrapeBentley = async (): Promise<DocumentType<Data>> => {
   const positive = getData('Cume Positive');
 
   const strings = tryTraverse(dataColumns, [2, 'dataValues']);
+  const dateMatch = new RegExp(/^Dashboard updated ([0-9]{4}-[0-9]{2}-[0-9]{2})/);
+  let date = '';
 
-  const updatedText = strings[strings.length - 1];
+  for (let i = strings.length - 1; i >= 0; i -= 1) {
+    const updatedText = strings[strings.length - 2];
 
-  const match = updatedText.match(/^Dashboard updated ([0-9]{4}-[0-9]{2}-[0-9]{2})/);
-  if (!match) {
+    const match = updatedText.match(dateMatch);
+    if (match) {
+      [, date] = match;
+      break;
+    }
+  }
+
+  if (!date) {
     throw new Error('Invalid date format.');
   }
 
   return new DataModel({
     collectionId: CollectionId.BENTLEY,
-    date: match[1],
+    date,
     tested,
     positive,
   });
