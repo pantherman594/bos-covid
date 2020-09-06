@@ -106,7 +106,7 @@ const scrapeBentley = async (): Promise<DocumentType<Data>> => {
   let date = '';
 
   for (let i = strings.length - 1; i >= 0; i -= 1) {
-    const updatedText = strings[strings.length - 2];
+    const updatedText = strings[i];
 
     const match = updatedText.match(dateMatch);
     if (match) {
