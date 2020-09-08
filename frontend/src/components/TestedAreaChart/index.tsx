@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { AreaChart, XAxis, YAxis, Legend, Area, Tooltip } from 'recharts';
+import { AreaChart, XAxis, YAxis, Legend, Area, Tooltip, Brush } from 'recharts';
 
 import style from './style.module.css';
 import { ChartContainer } from '../index';
@@ -60,6 +60,7 @@ export const TestedAreaChart = (props: TestedAreaChartProps) => {
       />
       <YAxis />
       <Tooltip content={renderTooltipContent} />
+      <Brush dataKey="date" tickFormatter={dateTickFormatter} />
       <Legend />
       {props.collections.map((collection: Collection) => collection.id === 'massachusetts' ? null : (
         <Area
