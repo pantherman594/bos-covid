@@ -29,6 +29,7 @@ interface IKeyDates {
 export interface ICollection {
   id: CollectionId;
   name: string;
+  color: string;
   population: number;
   children: CollectionId[];
   keyDates: IKeyDates[];
