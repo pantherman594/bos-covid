@@ -10,10 +10,10 @@ import { CollectionId } from '../types';
 const DATA_URL = 'https://www.harvard.edu/coronavirus/harvard-university-wide-covid-19-testing-dashboard';
 
 const EXPECTED_POSITIVE_LABELS = [
-  'Total positive cases',
-  'Total undergraduate student positive cases',
-  'Total graduate student positive cases',
-  'Total faculty, staff, or other affiliates positive cases',
+  'New positive cases',
+  'New undergraduate student positive cases',
+  'New graduate student positive cases',
+  'New faculty, staff, or other affiliates positive cases',
 ];
 
 const EXPECTED_TESTED_LABELS = [
@@ -108,6 +108,14 @@ const scrapeHarvard = async (): Promise<DocumentType<Data>[]> => {
 
   if (testedData.length !== EXPECTED_TESTED_LABELS.length) {
     throw new Error(`Did not store the correct number of data fields. Found: ${testedData.length}, Expected: ${EXPECTED_TESTED_LABELS.length}.`);
+  }
+
+  const cumulativeLabel = $('.stitle-key-stats-1-cumulative > header:nth-child(1) > h2:nth-child(1)');
+  if (cumulativeLabel.length !== 1) {
+    throw new Error('Did not find the cumulative label.');
+  }
+  if (cumulativeLabel.text().trim() !== 'Cumulative data since June 1, 2020') {
+    throw new Error('Cumulative label changed, please check scraper.');
   }
 
   const updated = $('.field-item > p:last-child');
