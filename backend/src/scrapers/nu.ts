@@ -16,7 +16,7 @@ const scrapeNu = async (): Promise<DocumentType<Data>> => {
   const data = res.body;
 
   const entries = data.feed.entry;
-  const date = entries[entries.length - 17].content.$t.split('/');
+  const date = entries[entries.length - 29].content.$t.split('/');
 
   if (date.length !== 3) {
     throw new Error('Invalid date format.');
