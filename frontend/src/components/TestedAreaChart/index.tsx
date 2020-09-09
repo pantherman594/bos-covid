@@ -29,13 +29,28 @@ export const TestedAreaChart = (props: TestedAreaChartProps) => {
   const renderTooltipContent = (o: any) => {
     const { payload, label } = o;
 
+    interface MappedEntry {
+      index: number;
+      value: number;
+    }
+
+    const mapped = payload.map((entry: any, index: number): MappedEntry => {
+      return { index, value: entry.value };
+    });
+
+    mapped.sort((a: MappedEntry, b: MappedEntry) => {
+      if (a.value < b.value) return 1;
+      if (a.value > b.value) return -1;
+      return 0;
+    });
+
     return (
       <div className={style.customTooltip}>
         <p>{dateTickFormatter(label)}</p>
         {
-          payload.map((entry: any, index: number) => (
-            <p key={`item-${index}`} style={{ color: entry.color }}>
-              {`${entry.name.split('_')[0].replace(/-/g, ' ')}: ${entry.value}`}
+          mapped.map((entry: MappedEntry) => (
+            <p key={`item-${entry.index}`} style={{ color: payload[entry.index].color }}>
+              {`${payload[entry.index].name.split('_')[0].replace(/-/g, ' ')}: ${entry.value}`}
             </p>
           ))
         }
