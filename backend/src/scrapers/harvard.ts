@@ -10,10 +10,10 @@ import { CollectionId } from '../types';
 const DATA_URL = 'https://www.harvard.edu/coronavirus/harvard-university-wide-covid-19-testing-dashboard';
 
 const EXPECTED_POSITIVE_LABELS = [
-  'New positive cases',
-  'New undergraduate student positive cases',
-  'New graduate student positive cases',
-  'New faculty, staff, or other affiliates positive cases',
+  'Total positive cases',
+  'Total undergraduate student positive cases',
+  'Total graduate student positive cases',
+  'Total faculty, staff, or other affiliates positive cases',
 ];
 
 const EXPECTED_TESTED_LABELS = [

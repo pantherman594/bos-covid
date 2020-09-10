@@ -23,14 +23,14 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
 
   const data = txtRes.text.split('\r\n');
 
-  const testedMatch = data[2].match(/^Total Tests Performed: ([0-9,]+)$/);
+  const testedMatch = data[11].match(/^Total Number of Tests with Results: ([0-9,]+)$/);
   if (!testedMatch) {
     throw new Error('Could not find total tested data.');
   }
 
-  const positivesMatch = data[8].match(/^Unique Positive Individuals: ([0-9,]+)$/);
+  const positivesMatch = data[14].match(/^Positive Tests: ([0-9,]+)$/);
   if (!positivesMatch) {
-    throw new Error('Could not find total tested data.');
+    throw new Error('Could not find positive tested data.');
   }
 
   return new DataModel({
