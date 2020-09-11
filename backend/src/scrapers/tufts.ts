@@ -21,7 +21,11 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
 
   const txtRes = await superagent.get(txtUrl);
 
-  const data = txtRes.text.split('\r\n');
+  const data = txtRes.text.split('\n');
+
+  if (data[10] !== 'Cumulative from August 3, 2020') {
+    throw new Error('Cumulative data label has changed, please check scraper.');
+  }
 
   const testedMatch = data[11].match(/^Total Number of Tests with Results: ([0-9,]+)$/);
   if (!testedMatch) {

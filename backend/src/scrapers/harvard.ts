@@ -114,7 +114,7 @@ const scrapeHarvard = async (): Promise<DocumentType<Data>[]> => {
   if (cumulativeLabel.length !== 1) {
     throw new Error('Did not find the cumulative label.');
   }
-  if (cumulativeLabel.text().trim() !== 'Cumulative data since June 1, 2020') {
+  if (cumulativeLabel.text().trim() !== 'Cases & Testing: Cumulative Since June 1, 2020') {
     throw new Error('Cumulative label changed, please check scraper.');
   }
 
