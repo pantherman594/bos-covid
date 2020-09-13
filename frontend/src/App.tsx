@@ -16,7 +16,7 @@ export const App: React.FunctionComponent = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const url = process.env.NODE_ENV !== 'production'
+      const url = process.env.NODE_ENV === 'production'
         ? 'https://boscovid.dav.sh/data'
         : 'http://localhost:5000/data';
 
