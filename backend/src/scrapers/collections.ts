@@ -112,14 +112,6 @@ const collections: ICollections = {
       },
     ],
   },
-  [CollectionId.HARVARD]: {
-    id: CollectionId.HARVARD,
-    name: 'Harvard University Undergrads',
-    color: 'a51c30',
-    population: 0,
-    children: [],
-    keyDates: [],
-  },
   [CollectionId.HARVARD_UNDERGRAD]: {
     id: CollectionId.HARVARD_UNDERGRAD,
     name: 'Harvard University Undergraduates',
