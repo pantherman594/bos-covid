@@ -3,6 +3,7 @@ import superagent from 'superagent';
 
 import {
   TestedAreaChart,
+  PositiveAreaChart,
 } from './components';
 import { CollectedDataItem, Collection, CovidDataItem } from './types';
 import './App.css';
@@ -15,7 +16,7 @@ export const App: React.FunctionComponent = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const url = process.env.NODE_ENV === 'production'
+      const url = process.env.NODE_ENV !== 'production'
         ? 'https://boscovid.dav.sh/data'
         : 'http://localhost:5000/data';
 
@@ -112,6 +113,8 @@ export const App: React.FunctionComponent = () => {
           </svg>
 
           <TestedAreaChart collections={collectionArray} data={collectedData} />
+
+          <PositiveAreaChart collections={collectionArray} data={collectedData} />
 
           {/*
           <PercentPositiveChart data={data} />
