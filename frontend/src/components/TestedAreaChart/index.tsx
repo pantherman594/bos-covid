@@ -19,7 +19,7 @@ export const TestedAreaChart = (props: TestedAreaChartProps) => {
 
       return {
         ...rest,
-        date: new Date(date).getTime(),
+        date: date.getTime(),
       };
     });
   };

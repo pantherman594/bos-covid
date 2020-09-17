@@ -23,13 +23,13 @@ export interface CovidDataItem {
 }
 
 export interface CollectedDataItem {
-  [key: string]: string | number;
-  date: string;
+  [key: string]: string | number | Date;
+  date: Date;
 }
 
-export const create = (collections: string[], date?: string): CollectedDataItem => {
+export const create = (collections: string[], date?: Date): CollectedDataItem => {
   const entry: CollectedDataItem = {
-    date: date || dateToString(new Date()),
+    date: date || new Date(),
   };
 
   collections.forEach((collectionId: string) => {

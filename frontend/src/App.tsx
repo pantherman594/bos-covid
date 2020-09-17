@@ -8,6 +8,11 @@ import {
 import { CollectedDataItem, Collection, CovidDataItem } from './types';
 import './App.css';
 
+const parseDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-').map((s: string) => parseInt(s));
+  return new Date(year, month - 1, day);
+};
+
 export const App: React.FunctionComponent = () => {
   const [data, setData] = useState<CovidDataItem[]>([]);
   const [collections, setCollections] = useState<{ [id: string]: Collection }>({});
@@ -61,7 +66,7 @@ export const App: React.FunctionComponent = () => {
     if (!indexMap.has(entry.date)) {
       indexMap.set(entry.date, collectedData.length);
       collectedData.push({
-        date: entry.date,
+        date: parseDate(entry.date),
       });
     }
 
@@ -90,7 +95,7 @@ export const App: React.FunctionComponent = () => {
             {'Updated: '}
             {data.length === 0
                 ? null
-                : new Date(data[data.length - 1].date).toLocaleDateString(
+                : parseDate(data[data.length - 1].date).toLocaleDateString(
                     undefined,
                     { day: 'numeric', month: 'numeric' },
                   )}
