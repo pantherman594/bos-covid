@@ -21,18 +21,20 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
 
   const txtRes = await superagent.get(txtUrl);
 
-  const data = txtRes.text.split('\n');
+  const splitLocation = txtRes.text.indexOf('Cumulative from August 3, 2020');
 
-  if (data[10] !== 'Cumulative from August 3, 2020') {
+  if (splitLocation === -1) {
     throw new Error('Cumulative data label has changed, please check scraper.');
   }
 
-  const testedMatch = data[11].match(/^Total Number of Tests with Results: ([0-9,]+)$/);
+  const data = txtRes.text.substring(splitLocation);
+
+  const testedMatch = data.match(/Total Number of Tests with Results: ([0-9,]+)/);
   if (!testedMatch) {
     throw new Error('Could not find total tested data.');
   }
 
-  const positivesMatch = data[14].match(/^Positive Tests: ([0-9,]+)$/);
+  const positivesMatch = data.match(/Positive Tests: ([0-9,]+)/);
   if (!positivesMatch) {
     throw new Error('Could not find positive tested data.');
   }
