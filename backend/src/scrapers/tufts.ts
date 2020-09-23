@@ -1,3 +1,4 @@
+import cheerio from 'cheerio';
 import superagent from 'superagent';
 import { DocumentType } from 'typegoose';
 
@@ -17,7 +18,7 @@ const scrapeTufts = async (): Promise<DocumentType<Data>> => {
   }
 
   const [month, day, year] = match[1].split('/').map((s: string) => tryParseInt(s));
-  const txtUrl = match[3];
+  const txtUrl = cheerio(`<p id="link">${match[3]}</p>`).text().trim();
 
   const txtRes = await superagent.get(txtUrl);
 
