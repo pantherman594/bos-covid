@@ -78,7 +78,7 @@ const scrapeMit = async (): Promise<DocumentType<Data>> => {
     'dataSegments',
     0,
     'dataColumns',
-    1,
+    2,
     'dataValues',
   ]);
 
@@ -100,43 +100,18 @@ const scrapeMit = async (): Promise<DocumentType<Data>> => {
     'dataSegments',
     1,
     'dataColumns',
-    1,
+    0,
     'dataValues',
   ]);
 
-  dataValues = [...dataValues, ...newDataValues];
+  const positive = tryParseInt(newDataValues[1]);
+  const tested = tryParseInt(newDataValues[0]);
 
-  const columns = tryTraverse(monthlyData, [
-    'vqlCmdResponse',
-    'layoutStatus',
-    'applicationPresModel',
-    'workbookPresModel',
-    'dashboardPresModel',
-    'zones',
-    3,
-    'presModelHolder',
-    'visual',
-    'vizData',
-    'paneColumnsData',
-    'paneColumnsList',
-    0,
-    'vizPaneColumns',
-    4,
-    'aliasIndices',
-  ]);
-
-  let positive = 0;
-  let tested = 0;
-
-  for (let i = 0; i < columns.length; i += 2) {
-    const positiveIndex = -1 - columns[i];
-    const testedIndex = -1 - columns[i + 1];
-
-    positive += tryParseInt(dataValues[positiveIndex]);
-    tested += tryParseInt(dataValues[testedIndex]);
+  if (positive >= tested) {
+    throw new Error('Invalid data parsed.');
   }
 
-  const date = parseDate(dataValues[0]);
+  const date = parseDate(dataValues[1]);
 
   return new DataModel({
     collectionId: CollectionId.MIT,
