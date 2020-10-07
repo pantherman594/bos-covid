@@ -39,17 +39,39 @@ const log = (prefix: string, title: string, ...message: any[]) => {
   console.log(`${chalk.bold(prefix)} ${chalk`{${color} ${title}}`} ${message.join(' ')}`);
 };
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const process = async (scraper: () => Promise<DocumentType<Data> | DocumentType<Data>[]>) => {
   log('>', scraper.name, 'starting.');
-  const start = new Date().getTime();
   let scrapeResult;
-  try {
-    scrapeResult = await scraper();
-    log('=', scraper.name, 'finished in', new Date().getTime() - start, 'ms.');
-  } catch (err) {
-    log('!', scraper.name, 'errored after', new Date().getTime() - start, 'ms.');
-    error(err);
-    return;
+
+  // Try to scrape 3 times.
+  let i = 0;
+  while (true) {
+    const start = new Date().getTime();
+    try {
+      scrapeResult = await scraper();
+      log('=', scraper.name, 'finished in', new Date().getTime() - start, 'ms.');
+      break;
+    } catch (err) {
+      i += 1;
+      if (i >= 3) {
+        log(
+          '!', scraper.name,
+          'errored on attempt', i,
+          'after', new Date().getTime() - start, 'ms. Giving up.'
+        );
+        error(err);
+        return;
+      }
+
+      log(
+        '!', scraper.name,
+        'errored on attempt', i,
+        'after', new Date().getTime() - start, 'ms. Retrying in 10s...'
+      );
+      await sleep(10 * 1000);
+    }
   }
 
   let datas: DocumentType<Data>[];

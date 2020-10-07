@@ -69,7 +69,7 @@ const scrapeMit = async (): Promise<DocumentType<Data>> => {
 
   const secondaryData = JSON.parse(data[1]);
 
-  let dataValues = tryTraverse(secondaryData, [
+  let dataColumns = tryTraverse(secondaryData, [
     'secondaryInfo',
     'presModelMap',
     'dataDictionary',
@@ -78,9 +78,12 @@ const scrapeMit = async (): Promise<DocumentType<Data>> => {
     'dataSegments',
     0,
     'dataColumns',
-    2,
-    'dataValues',
   ]);
+
+  const oldIntegerValues = tryTraverse(dataColumns, [0, 'dataValues']);
+  const oldStringValues = tryTraverse(dataColumns, [2, 'dataValues']);
+
+  let zones: any;
 
   const monthlyRes = await superagent
     .post(`https://tableau.mit.edu/vizql/t/COVID-19/w/COVIDTestResultsforMITMedicalWebpage-2/v/Dashboard1/sessions/${sessionid}/commands/tabdoc/set-parameter-value`)
@@ -92,26 +95,67 @@ const scrapeMit = async (): Promise<DocumentType<Data>> => {
 
   const monthlyData = JSON.parse(monthlyRes.body.toString());
 
-  const newDataValues = tryTraverse(monthlyData, [
+  zones = tryTraverse(monthlyData, [
+    'vqlCmdResponse',
+    'layoutStatus',
+    'applicationPresModel',
+    'workbookPresModel',
+    'dashboardPresModel',
+    'zones',
+  ]);
+
+  const newDataColumnsParent = Object.values(tryTraverse(monthlyData, [
     'vqlCmdResponse',
     'layoutStatus',
     'applicationPresModel',
     'dataDictionary',
     'dataSegments',
-    1,
-    'dataColumns',
-    0,
-    'dataValues',
-  ]);
+  ]))[0];
 
-  const positive = tryParseInt(newDataValues[1]);
-  const tested = tryParseInt(newDataValues[0]);
+  const newDataColumns = tryTraverse(newDataColumnsParent, ['dataColumns']);
+
+  const newIntegerValues = tryTraverse(newDataColumns, [0, 'dataValues']);
+  const newStringValues = tryTraverse(newDataColumns, [2, 'dataValues']);
+
+  if (newStringValues[0] === oldStringValues[0]) {
+    throw new Error('Invalid data received.');
+  }
+
+  const integerValues = [...oldIntegerValues, ...newIntegerValues];
+  const stringValues = [...oldStringValues, ...newStringValues];
+
+  const getData = (label: string) => {
+    const zone = Object.values(zones).find((zone: any) => zone.worksheet === label);
+    if (!zone) throw new Error('Could not find zone data.');
+
+    const index = tryTraverse(zone, [
+      'presModelHolder',
+      'visual',
+      'vizData',
+      'paneColumnsData',
+      'paneColumnsList',
+      0,
+      'vizPaneColumns',
+      1,
+      'aliasIndices',
+    ]).find(() => true);
+
+    const value = (index < oldIntegerValues.length ? newIntegerValues : integerValues)[index];
+    if (label === undefined) {
+      throw new Error('Invalid data.');
+    }
+
+    return value;
+  };
+
+  const positive = getData('Cumulative Positives for Period');
+  const tested = getData('Cumulative Tests for Period');
 
   if (positive >= tested) {
     throw new Error('Invalid data parsed.');
   }
 
-  const date = parseDate(dataValues[1]);
+  const date = parseDate(stringValues[1]);
 
   return new DataModel({
     collectionId: CollectionId.MIT,
