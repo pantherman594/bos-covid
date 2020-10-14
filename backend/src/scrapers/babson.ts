@@ -82,7 +82,7 @@ const scrapeBabson = async (): Promise<DocumentType<Data>> => {
     return total + tryParseInt(value);
   }, 0);
 
-  const updated = $('#id-1245136 > p:nth-child(3)');
+  const updated = $('#id-1245136 > p:last-of-type');
 
   // Ensure that we found the date.
   if (updated.length !== 1) {
