@@ -1,4 +1,3 @@
-import cheerio from 'cheerio';
 import superagent from 'superagent';
 import { DocumentType } from 'typegoose';
 
@@ -11,91 +10,28 @@ import { CollectionId } from '../types';
 // Milliseconds per day.
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-const DATA_URL = 'https://www.wellesley.edu/coronavirus/dashboard';
-
-const EXPECTED_LABELS = [
-  'Total Asymptomatic Test Results in Past 7 Testing Days',
-  'Positive Cases in Past 7 Testing Days',
-];
+// From https://www.wellesley.edu/coronavirus/dashboard
+const DATA_URL = 'https://spreadsheets.google.com/feeds/cells/1g1O96eAOENy81mLBTll_7KoNq5fpaoNpofM47eKIITY/1/public/full?alt=json';
 
 const scrapeWellesley = async (): Promise< DocumentType<Data>[]> => {
   // Attempt to load the webpage.
-  let res;
-  try {
-    res = await superagent.get(DATA_URL);
-  } catch (err) {
-    if (err.status === 403) {
-      // This is a known error with no known solution. We'll just ignore it for now.
-      return [];
-    }
+  const res = await superagent.get(DATA_URL);
 
-    throw err;
+  const data = res.body;
+
+  const entries = data.feed.entry;
+  const dateParts = entries[1].content.$t.split('/');
+
+  if (dateParts.length !== 3) {
+    throw new Error('Invalid date format.');
   }
 
-  const $ = cheerio.load(res.text);
-
-  // Remove all the superscripts.
-  $('sup').remove();
-
-  // Extract the grid of data items from the page.
-  const dataBoxes = $('.card-container > li:not(.link-outside)');
-
-  // Ensure that we found the grid.
-  if (dataBoxes.length !== EXPECTED_LABELS.length) {
-    throw new Error('Did not find the data boxes.');
-  }
-
-  const labels = dataBoxes.find('.card-title');
-  const fields = dataBoxes.find('.number');
-
-  // Ensure we have the expected labels and fields.
-  if (labels.length !== EXPECTED_LABELS.length || fields.length !== EXPECTED_LABELS.length) {
-    throw new Error('Did not find the correct number of data fields.');
-  }
-
-  const failedLabels: string[] = [];
-  labels.each(function f(this: Cheerio, i: number, _elem: any) {
-    if ($(this).text().trim() !== EXPECTED_LABELS[i]) {
-      failedLabels.push(EXPECTED_LABELS[i]);
-    }
-  });
-
-  if (failedLabels.length > 0) {
-    throw new Error(`Labels have changed, please fix scraper. Failed labels: ${failedLabels.join(', ')}.`);
-  }
-
-  const data: number[] = [];
-
-  // Convert the fields into numbers, stripping commas, and add to the data array.
-  fields.each(function f(this: Cheerio, _i: number, _elem: any) {
-    data.push(tryParseInt($(this).text().replace(/,/g, '')));
-  });
-
-  if (data.length !== EXPECTED_LABELS.length) {
-    throw new Error(`Did not store the correct number of data fields. Found: ${data.length}, Expected: ${EXPECTED_LABELS.length}.`);
-  }
-
-  const updated = $('.content-wrapper > section:nth-child(1) > h2:nth-child(1)');
-
-  // Ensure that we found the date.
-  if (updated.length !== 1) {
-    throw new Error('Did not find the updated date.');
-  }
-
-  const updatedText = updated.text().trim();
-  const match = updatedText.match(/^UPDATED ([A-Z]+) ([0-9]{1,2}), ([0-9]{4})$/);
-  if (!match) {
-    throw new Error('Updated date format invalid.');
-  }
-
-  const month = strToMonth(match[1]);
-  const day = tryParseInt(match[2]);
-  const year = tryParseInt(match[3]);
+  const [month, day, year] = dateParts.map((s: string) => tryParseInt(s));
+  const tested = tryParseInt(entries[3].content.$t);
+  const positive = tryParseInt(entries[5].content.$t);
 
   const date = ymdToString(year, month, day);
   const dateObj = new Date(date);
-
-  const [tested, positive] = data;
 
   const lastDateObj = new Date(dateObj.getTime() - 7 * MS_PER_DAY);
   const lastDate = dateToString(lastDateObj);
