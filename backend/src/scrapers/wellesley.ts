@@ -1,7 +1,7 @@
 import superagent from 'superagent';
 import { DocumentType } from 'typegoose';
 
-import { dateToString, strToMonth, ymdToString } from '../lib/date';
+import { dateToString, ymdToString } from '../lib/date';
 import connectDB from '../lib/db';
 import { tryParseInt } from '../lib/try';
 import DataModel, { Data } from '../models/Data';
