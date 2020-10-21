@@ -118,15 +118,22 @@ const scrapeHarvard = async (): Promise<DocumentType<Data>[]> => {
     throw new Error('Cumulative label changed, please check scraper.');
   }
 
-  const updated = $('.field-item > p:last-child');
+  const updated = $('.field-item > p');
 
   // Ensure that we found the date.
-  if (updated.length !== 1) {
+  if (updated.length === 0) {
     throw new Error('Did not find the updated date.');
   }
 
-  const updatedText = updated.text().trim();
-  const match = updatedText.match(/^All data is as of [^,]+, ([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/);
+  let match: RegExpMatchArray | null = null;
+
+  updated.each(function f(this: Cheerio, _i: number, _elem: any) {
+    if (match !== null) return;
+
+    const updatedText = $(this).text().trim();
+    match = updatedText.match(/^All data is as of [^,]+, ([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/);
+  });
+
   if (!match) {
     throw new Error('Updated date format invalid.');
   }
