@@ -26,7 +26,7 @@
     "tmp": "^0.2.1",
     "typegoose": "npm:@typegoose/typegoose@^7.3.2",
     "unzipper": "^0.10.11",
-    "xlsx": "^0.16.6"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.32",
